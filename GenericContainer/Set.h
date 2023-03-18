@@ -23,10 +23,9 @@ namespace GenericContainers {
 		Set() : m_Size(0), m_Root(nullptr) {};
 		~Set();
 
-		void Create();
 		void Create(const T& initialValue);
 		void Destroy();
-		void Add(const T& value);
+		void Insert(const T& value);
 		void Remove(const T& value);
 		T Get(const size_t& index) const;
 		void Edit(const T& oldValue, const T& newValue);
@@ -48,12 +47,6 @@ namespace GenericContainers {
 	}
 
 	template<typename T>
-	inline void Set<T>::Create() {
-		m_Root = nullptr;
-		m_Size = 0;
-	}
-
-	template<typename T>
 	inline void Set<T>::Create(const T& initialValue) {
 		m_Root = std::make_unique<Node>(initialValue);
 		m_Size = 1;
@@ -66,8 +59,31 @@ namespace GenericContainers {
 	}
 
 	template<typename T>
-	inline void Set<T>::Add(const T& value) {
+	inline void Set<T>::Insert(const T& value) {
+		if (m_Root == nullptr) {
+			m_Root = std::make_unique<Node>(value);
+			return;
+		}
 
+		std::unique_ptr<Node>* current = &m_Root;
+
+		while (*current) {
+			Node* node = current->get();
+
+			if (value < node->value) {
+				current = &(node->left);
+			}
+			else if (value > node->value) {
+				current = &(node->right);
+			}
+			else {
+				return;
+			}
+		}
+
+		std::unique_ptr<Node> newNode = std::make_unique<Node>(value);
+		*current = std::move(newNode);
+		++m_Size;
 	}
 
 	template<typename T>
@@ -92,7 +108,7 @@ namespace GenericContainers {
 
 	template<typename T>
 	inline size_t Set<T>::Size() const {
-		return size_t();
+		return m_Size;
 	}
 
 	template<typename T>

@@ -20,7 +20,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AVLContainer.h">
+    <ClInclude Include="Set.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
