@@ -2,6 +2,7 @@
 #define SET_H
 
 #include <memory>
+#include <cmath>
 
 namespace GenericContainers {
 	template<typename T>
@@ -12,9 +13,13 @@ namespace GenericContainers {
 			int height;
 			std::unique_ptr<Node> left;
 			std::unique_ptr<Node> right;
+			std::unique_ptr<Node> parent;
 
-			Node(const T& value) : value(value), height(1), left(nullptr), right(nullptr) {}
+			Node(const T& value) : value(value), height(1), left(nullptr), right(nullptr), parent(nullptr) {}
 			~Node();
+
+			void Insert(const T& value);
+			int GetBalanceFactor();
 		};
 
 		std::unique_ptr<Node> m_Root;
@@ -65,25 +70,69 @@ namespace GenericContainers {
 			return;
 		}
 
-		std::unique_ptr<Node>* current = &m_Root;
+		//TODO: Check if value is existing in set
+		(*m_Root).Insert(value);
+		++m_Size;
+	}
 
-		while (*current) {
-			Node* node = current->get();
-
-			if (value < node->value) {
-				current = &(node->left);
-			}
-			else if (value > node->value) {
-				current = &(node->right);
+	template<typename T>
+	inline void Set<T>::Node::Insert(const T& value) {
+		if (value < this->value) {
+			if (this->left == nullptr) {
+				this->left = std::make_unique<Node>(value);
+				this->left->height = this->height + 1;
 			}
 			else {
-				return;
+				this->left->Insert(value);
+			}
+		}
+		else if (value > this->value) {
+			if (this->right == nullptr) {
+				this->right = std::make_unique<Node>(value);
+				this->right->height = this->height + 1;
+			}
+			else {
+				this->right->Insert(value);
 			}
 		}
 
-		std::unique_ptr<Node> newNode = std::make_unique<Node>(value);
-		*current = std::move(newNode);
-		++m_Size;
+		int balanceFactor = GetBalanceFactor();
+
+		if (balanceFactor > 1) {
+			if (value < this->left->value) {
+				//RotateRight();
+			}
+			else {
+				//this->left->RotateLeft();
+				//RotateRight();
+			}
+		}
+		else if (balanceFactor < -1) {
+			if (value < this->right->value) {
+				//RotateLeft();
+			}
+			else {
+				//this->right->RotateRight();
+				//RotateLeft();
+			}
+		}
+	}
+
+	template<typename T>
+	inline int Set<T>::Node::GetBalanceFactor() {
+		int balanceFactor = 0;
+
+		if (this->left != nullptr && this->right != nullptr) {
+			balanceFactor = this->left->height - this->right->height;
+		}
+		else if (this->left != nullptr && this->right == nullptr) {
+			balanceFactor = this->left->height;
+		}
+		else if (this->left == nullptr && this->right != nullptr) {
+			balanceFactor = -this->right->height;
+		}
+
+		return balanceFactor;
 	}
 
 	template<typename T>
