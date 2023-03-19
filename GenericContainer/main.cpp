@@ -11,9 +11,13 @@ int main()
 
     container.Insert(6);
 
+    container.Insert(7);
+
     std::cout << container.Size() << std::endl;
 
-    int a = container.Get(1);
+    int a = container.Get(2);
+
+    std::cout << a;
 
     return 0;
 }

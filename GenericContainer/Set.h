@@ -93,17 +93,20 @@ namespace GenericContainers {
 			return node;
 		}
 
+		T InOrderTraversal(Node* node, size_t& index);
+
 		Node* m_Root;
 		size_t m_Size;
+		T m_DefaultValue;
 	public:
-		Set() : m_Size(0), m_Root(nullptr) {};
+		Set() : m_Size(0), m_Root(nullptr), m_DefaultValue(T()) {};
 		~Set();
 
 		void Create(const T& initialValue);
 		void Destroy();
 		void Insert(const T& value);
 		void Remove(const T& value);
-		T Get(const size_t& index) const;
+		T Get(size_t index);
 		void Edit(const T& oldValue, const T& newValue);
 		bool Contains(const T& value) const;
 		size_t Size() const;
@@ -178,12 +181,34 @@ namespace GenericContainers {
 	}
 
 	template<typename T>
-	inline T Set<T>::Get(const size_t& index) const {
+	inline T Set<T>::Get(size_t index) {
 		if (index >= m_Size) {
 			throw std::out_of_range("out_of_range");
 		}
 
-		return T();
+		return InOrderTraversal(m_Root, index);
+	}
+
+	template<typename T>
+	inline T Set<T>::InOrderTraversal(Node* node, size_t& index) {
+		T result = T();
+
+		if (node->left != nullptr) {
+			result = InOrderTraversal(node->left, index);
+		}
+
+		if (result == m_DefaultValue && index == 0) {
+			result = node->value;
+		}
+		else {
+			--index;
+		}
+
+		if (result == m_DefaultValue && node->right != nullptr) {
+			result = InOrderTraversal(node->right, index);
+		}
+
+		return result;
 	}
 
 	template<typename T>
