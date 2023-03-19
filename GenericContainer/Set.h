@@ -54,6 +54,7 @@ namespace GenericContainers {
 		Node* Insert(Node* node, const T& value) {
 			if (node == nullptr) {
 				node = new Node(value);
+				++m_Size;
 				return node;
 			}
 
@@ -67,7 +68,6 @@ namespace GenericContainers {
 				return node;
 			}
 
-			++m_Size;
 			node->UpdateHeight();
 
 			int balanceFactor = node->CalculateBalanceFactor();
