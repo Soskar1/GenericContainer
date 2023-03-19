@@ -67,6 +67,25 @@ int main() {
 
 	std::cout << "std::set<int> average insertion time: " << std::setprecision(5) << std::fixed << stdSetTime / ELEMENT_COUNT << " microseconds" << std::endl;
 	std::cout << "GenericContainers::Set<int> average insertion time: " << std::setprecision(5) << std::fixed << mySetTime / ELEMENT_COUNT << " microseconds" << std::endl;
+	std::cout << "---------\n";
+
+	for (int index = 0; index < mySet.Size(); ++index) {
+		auto begin = std::chrono::high_resolution_clock().now();
+		std::set<int>::iterator it = stdSet.begin();
+		std::advance(it, index);
+		int x = *it;
+		auto end = std::chrono::high_resolution_clock().now();
+
+		stdSetTime += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+
+		begin = std::chrono::high_resolution_clock().now();
+		mySet.Get(index);
+		end = std::chrono::high_resolution_clock().now();
+
+		mySetTime += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+	}
+	std::cout << "std::set<int> average Get time: " << std::setprecision(5) << std::fixed << stdSetTime / ELEMENT_COUNT << " microseconds" << std::endl;
+	std::cout << "GenericContainers::Set<int> average Get time: " << std::setprecision(5) << std::fixed << mySetTime / ELEMENT_COUNT << " microseconds" << std::endl;
 	
 	return 0;
 }
