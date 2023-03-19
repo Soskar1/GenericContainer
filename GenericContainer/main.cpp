@@ -13,5 +13,7 @@ int main()
 
     std::cout << container.Size() << std::endl;
 
+    int a = container.Get(1);
+
     return 0;
 }

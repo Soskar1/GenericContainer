@@ -70,7 +70,7 @@ namespace GenericContainers {
 			++m_Size;
 			node->UpdateHeight();
 
-			int balanceFactor = node->GetBalanceFactor();
+			int balanceFactor = node->CalculateBalanceFactor();
 
 			if (balanceFactor > 1 && value < node->left->value) {
 				return RotateRight(node);
@@ -179,6 +179,10 @@ namespace GenericContainers {
 
 	template<typename T>
 	inline T Set<T>::Get(const size_t& index) const {
+		if (index >= m_Size) {
+			throw std::out_of_range("out_of_range");
+		}
+
 		return T();
 	}
 
