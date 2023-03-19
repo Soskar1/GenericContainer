@@ -13,6 +13,5 @@ int main()
 
     std::cout << container.Size() << std::endl;
 
-    container.Destroy();
     return 0;
 }

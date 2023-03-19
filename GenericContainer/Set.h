@@ -1,8 +1,8 @@
 #ifndef SET_H
 #define SET_H
 
-#include <memory>
-#include <cmath>
+#include <algorithm>
+#include <stdexcept>
 
 namespace GenericContainers {
 	template<typename T>
@@ -11,18 +11,89 @@ namespace GenericContainers {
 		struct Node {
 			T value;
 			int height;
-			std::unique_ptr<Node> left;
-			std::unique_ptr<Node> right;
-			std::unique_ptr<Node> parent;
+			Node* left;
+			Node* right;
 
-			Node(const T& value) : value(value), height(1), left(nullptr), right(nullptr), parent(nullptr) {}
+			Node(const T& value) : value(value), height(1), left(nullptr), right(nullptr) {}
 			~Node();
 
-			void Insert(const T& value);
-			int GetBalanceFactor();
+			int CalculateBalanceFactor() const;
+			void UpdateHeight();
 		};
 
-		std::unique_ptr<Node> m_Root;
+		Node* RotateLeft(Node* node) {
+			Node* rightChild = node->right;
+			node->right = rightChild->left;
+			rightChild->left = node;
+
+			node->UpdateHeight();
+			rightChild->UpdateHeight();
+
+			if (m_Root == node) {
+				m_Root = rightChild;
+			}
+
+			return rightChild;
+		}
+
+		Node* RotateRight(Node* node) {
+			Node* leftChild = node->left;
+			node->left = leftChild->right;
+			leftChild->right = node;
+
+			node->UpdateHeight();
+			leftChild->UpdateHeight();
+
+			if (m_Root == node) {
+				m_Root = leftChild;
+			}
+
+			return leftChild;
+		}
+
+		Node* Insert(Node* node, const T& value) {
+			if (node == nullptr) {
+				node = new Node(value);
+				return node;
+			}
+
+			if (value < node->value) {
+				node->left = Insert(node->left, value);
+			}
+			else if (value > node->value) {
+				node->right = Insert(node->right, value);
+			}
+			else {
+				return node;
+			}
+
+			++m_Size;
+			node->UpdateHeight();
+
+			int balanceFactor = node->GetBalanceFactor();
+
+			if (balanceFactor > 1 && value < node->left->value) {
+				return RotateRight(node);
+			}
+
+			if (balanceFactor < -1 && value > node->right->value) {
+				return RotateLeft(node);
+			}
+
+			if (balanceFactor > 1 && value > node->left->value) {
+				node->left = RotateLeft(node->left);
+				return RotateRight(node);
+			}
+
+			if (balanceFactor < -1 && value < node->right->value) {
+				node->right = RotateRight(node->right);
+				return RotateLeft(node);
+			}
+
+			return node;
+		}
+
+		Node* m_Root;
 		size_t m_Size;
 	public:
 		Set() : m_Size(0), m_Root(nullptr) {};
@@ -41,85 +112,35 @@ namespace GenericContainers {
 
 	template<typename T>
 	inline Set<T>::Node::~Node() {
-		left.reset();
-		right.reset();
+		delete left;
+		delete right;
 	}
 
 	template<typename T>
 	inline Set<T>::~Set() {
 		m_Size = 0;
-		m_Root.reset();
+		delete m_Root;
 	}
 
 	template<typename T>
 	inline void Set<T>::Create(const T& initialValue) {
-		m_Root = std::make_unique<Node>(initialValue);
+		m_Root = new Node(initialValue);
 		m_Size = 1;
 	}
 
 	template<typename T>
 	inline void Set<T>::Destroy() {
 		m_Size = 0;
-		m_Root.reset();
+		delete m_Root;
 	}
 
 	template<typename T>
 	inline void Set<T>::Insert(const T& value) {
-		if (m_Root == nullptr) {
-			m_Root = std::make_unique<Node>(value);
-			return;
-		}
-
-		//TODO: Check if value is existing in set
-		(*m_Root).Insert(value);
-		++m_Size;
+		m_Root = Insert(m_Root, value);
 	}
 
 	template<typename T>
-	inline void Set<T>::Node::Insert(const T& value) {
-		if (value < this->value) {
-			if (this->left == nullptr) {
-				this->left = std::make_unique<Node>(value);
-				this->left->height = this->height + 1;
-			}
-			else {
-				this->left->Insert(value);
-			}
-		}
-		else if (value > this->value) {
-			if (this->right == nullptr) {
-				this->right = std::make_unique<Node>(value);
-				this->right->height = this->height + 1;
-			}
-			else {
-				this->right->Insert(value);
-			}
-		}
-
-		int balanceFactor = GetBalanceFactor();
-
-		if (balanceFactor > 1) {
-			if (value < this->left->value) {
-				//RotateRight();
-			}
-			else {
-				//this->left->RotateLeft();
-				//RotateRight();
-			}
-		}
-		else if (balanceFactor < -1) {
-			if (value < this->right->value) {
-				//RotateLeft();
-			}
-			else {
-				//this->right->RotateRight();
-				//RotateLeft();
-			}
-		}
-	}
-
-	template<typename T>
-	inline int Set<T>::Node::GetBalanceFactor() {
+	inline int Set<T>::Node::CalculateBalanceFactor() const {
 		int balanceFactor = 0;
 
 		if (this->left != nullptr && this->right != nullptr) {
@@ -133,6 +154,22 @@ namespace GenericContainers {
 		}
 
 		return balanceFactor;
+	}
+
+	template<typename T>
+	inline void Set<T>::Node::UpdateHeight() {
+		if (this->left != nullptr && this->right != nullptr) {
+			this->height = std::max(this->left->height, this->right->height) + 1;
+		}
+		else if (this->left != nullptr && this->right == nullptr) {
+			this->height = this->left->height + 1;
+		}
+		else if (this->left == nullptr && this->right != nullptr) {
+			this->height = this->right->height + 1;
+		}
+		else {
+			this->height = 1;
+		}
 	}
 
 	template<typename T>
