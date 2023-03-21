@@ -5,18 +5,19 @@
 #include <functional>
 #include <chrono>
 #include <iomanip>
+#include <random>
 #include <set>
 
 #include "Set.h"
 
 #define ELEMENT_COUNT 10000
-int arr[ELEMENT_COUNT];
+std::vector<int> arr;
 
-//#define SPEED_TEST
+#define SPEED_TEST
 
 void GenerateRandomValues() {
 	for (int index = 0; index < ELEMENT_COUNT; ++index) {
-		arr[index] = rand();
+		arr.push_back(rand());
 	}
 }
 
@@ -59,6 +60,7 @@ void SetRemoveTest(const std::vector<int>& arr, const std::vector<int>& elements
 }
 
 int main() {
+#ifndef SPEED_TEST
 	SetInsertionTest(std::vector<int>{7, 6, 5});
 	SetInsertionTest(std::vector<int>{10, 5, 15, 3, 7, 12, 20});
 	SetInsertionTest(std::vector<int>{1, 2, 3, 4, 5});
@@ -75,8 +77,7 @@ int main() {
 
 	SetRemoveTest(std::vector<int>{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100},
 		std::vector<int>{11, 23, 37, 50, 62, 75, 89});
-
-#ifdef SPEED_TEST
+#else
 	std::set<int> stdSet;
 	GenericContainers::Set<int> mySet;
 
@@ -102,6 +103,9 @@ int main() {
 	std::cout << "GenericContainers::Set<int> average insertion time: " << std::setprecision(5) << std::fixed << mySetTime / ELEMENT_COUNT << " microseconds\n";
 	std::cout << "---------\n";
 
+	stdSetTime = 0;
+	mySetTime = 0;
+
 	for (int index = 0; index < mySet.Size(); ++index) {
 		auto begin = std::chrono::high_resolution_clock().now();
 		std::set<int>::iterator it = stdSet.begin();
@@ -117,8 +121,33 @@ int main() {
 
 		mySetTime += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
 	}
+
 	std::cout << "std::set<int> average Get time: " << std::setprecision(5) << std::fixed << stdSetTime / ELEMENT_COUNT << " microseconds\n";
 	std::cout << "GenericContainers::Set<int> average Get time: " << std::setprecision(5) << std::fixed << mySetTime / ELEMENT_COUNT << " microseconds\n";
+	std::cout << "---------\n";
+
+	stdSetTime = 0;
+	mySetTime = 0;
+
+	auto rng = std::default_random_engine{};
+	std::shuffle(std::begin(arr), std::end(arr), rng);
+	size_t initialSize = mySet.Size();
+	for (int index = 0; index < mySet.Size(); ++index) {
+		auto begin = std::chrono::high_resolution_clock().now();
+		stdSet.erase(arr[index]);
+		auto end = std::chrono::high_resolution_clock().now();
+
+		stdSetTime += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+
+		begin = std::chrono::high_resolution_clock().now();
+		mySet.Remove(arr[index]);
+		end = std::chrono::high_resolution_clock().now();
+
+		mySetTime += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+	}
+
+	std::cout << "std::set<int> average erase/remove time: " << std::setprecision(5) << std::fixed << stdSetTime / initialSize << " microseconds\n";
+	std::cout << "GenericContainers::Set<int> average erase/remove time: " << std::setprecision(5) << std::fixed << mySetTime / initialSize << " microseconds\n";
 #endif
 	return 0;
 }
