@@ -285,7 +285,7 @@ namespace GenericContainers {
 	template<typename T>
 	typename Set<T>::Node* Set<T>::GetMinimumNode(Node* node) {
 		Node* current = node;
-		while (current != nullptr) {
+		while (current->left != nullptr) {
 			current = current->left;
 		}
 
