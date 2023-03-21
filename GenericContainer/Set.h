@@ -24,7 +24,6 @@ namespace GenericContainers {
 
 		Node* RotateLeft(Node* node);
 		Node* RotateRight(Node* node);
-		Node* TryBalance(Node* node, const T& value);
 		Node* Insert(Node* node, const T& value);
 		Node* Remove(Node* node, const T& value);
 		Node* GetMinimumNode(Node* node);
@@ -97,7 +96,27 @@ namespace GenericContainers {
 
 		node->UpdateHeight();
 
-		return TryBalance(node, value);
+		int balanceFactor = node->CalculateBalanceFactor();
+
+		if (balanceFactor > 1 && value < node->left->value) {
+			return RotateRight(node);
+		}
+
+		if (balanceFactor < -1 && value > node->right->value) {
+			return RotateLeft(node);
+		}
+
+		if (balanceFactor > 1 && value > node->left->value) {
+			node->left = RotateLeft(node->left);
+			return RotateRight(node);
+		}
+
+		if (balanceFactor < -1 && value < node->right->value) {
+			node->right = RotateRight(node->right);
+			return RotateLeft(node);
+		}
+
+		return node;
 	}
 
 	template<typename T>
@@ -130,31 +149,6 @@ namespace GenericContainers {
 		}
 
 		return leftChild;
-	}
-
-	template<typename T>
-	typename Set<T>::Node* Set<T>::TryBalance(Node* node, const T& value) {
-		int balanceFactor = node->CalculateBalanceFactor();
-
-		if (balanceFactor > 1 && value < node->left->value) {
-			return RotateRight(node);
-		}
-
-		if (balanceFactor < -1 && value > node->right->value) {
-			return RotateLeft(node);
-		}
-
-		if (balanceFactor > 1 && value > node->left->value) {
-			node->left = RotateLeft(node->left);
-			return RotateRight(node);
-		}
-
-		if (balanceFactor < -1 && value < node->right->value) {
-			node->right = RotateRight(node->right);
-			return RotateLeft(node);
-		}
-
-		return node;
 	}
 
 	template<typename T>
@@ -233,7 +227,28 @@ namespace GenericContainers {
 		}
 
 		node->UpdateHeight();
-		return TryBalance(node, value);
+
+		int balanceFactor = node->CalculateBalanceFactor();
+		if (balanceFactor > 1) {
+			if (node->left->CalculateBalanceFactor() >= 0) {
+				return RotateRight(node);
+			}
+			else {
+				node->left = RotateLeft(node->left);
+				return RotateRight(node);
+			}
+		}
+		else if (balanceFactor < -1) {
+			if (node->right->CalculateBalanceFactor() <= 0) {
+				return RotateLeft(node);
+			}
+			else {
+				node->right = RotateRight(node->right);
+				return RotateLeft(node);
+			}
+		}
+
+		return node;
 	}
 
 	template<typename T>
