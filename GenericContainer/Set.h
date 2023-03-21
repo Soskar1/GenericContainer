@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <stdexcept>
+#include <cstdlib>
 
 namespace GenericContainers {
 	template<typename T>
@@ -21,78 +22,12 @@ namespace GenericContainers {
 			void UpdateHeight();
 		};
 
-		Node* RotateLeft(Node* node) {
-			Node* rightChild = node->right;
-			node->right = rightChild->left;
-			rightChild->left = node;
-
-			node->UpdateHeight();
-			rightChild->UpdateHeight();
-
-			if (m_Root == node) {
-				m_Root = rightChild;
-			}
-
-			return rightChild;
-		}
-
-		Node* RotateRight(Node* node) {
-			Node* leftChild = node->left;
-			node->left = leftChild->right;
-			leftChild->right = node;
-
-			node->UpdateHeight();
-			leftChild->UpdateHeight();
-
-			if (m_Root == node) {
-				m_Root = leftChild;
-			}
-
-			return leftChild;
-		}
-
-		Node* Insert(Node* node, const T& value) {
-			if (node == nullptr) {
-				node = new Node(value);
-				++m_Size;
-				return node;
-			}
-
-			if (value < node->value) {
-				node->left = Insert(node->left, value);
-			}
-			else if (value > node->value) {
-				node->right = Insert(node->right, value);
-			}
-			else {
-				return node;
-			}
-
-			node->UpdateHeight();
-
-			int balanceFactor = node->CalculateBalanceFactor();
-
-			if (balanceFactor > 1 && value < node->left->value) {
-				return RotateRight(node);
-			}
-
-			if (balanceFactor < -1 && value > node->right->value) {
-				return RotateLeft(node);
-			}
-
-			if (balanceFactor > 1 && value > node->left->value) {
-				node->left = RotateLeft(node->left);
-				return RotateRight(node);
-			}
-
-			if (balanceFactor < -1 && value < node->right->value) {
-				node->right = RotateRight(node->right);
-				return RotateLeft(node);
-			}
-
-			return node;
-		}
-
+		Node* RotateLeft(Node* node);
+		Node* RotateRight(Node* node);
+		Node* TryBalance(Node* node, const T& value);
+		Node* Insert(Node* node, const T& value);
+		Node* Remove(Node* node, const T& value);
+		Node* GetMinimumNode(Node* node);
 		T InOrderTraversal(Node* node, size_t& index);
 
 		Node* m_Root;
@@ -143,6 +78,86 @@ namespace GenericContainers {
 	}
 
 	template<typename T>
+	typename Set<T>::Node* Set<T>::Insert(Node* node, const T& value) {
+		if (node == nullptr) {
+			node = new Node(value);
+			++m_Size;
+			return node;
+		}
+
+		if (value < node->value) {
+			node->left = Insert(node->left, value);
+		}
+		else if (value > node->value) {
+			node->right = Insert(node->right, value);
+		}
+		else {
+			return node;
+		}
+
+		node->UpdateHeight();
+
+		return TryBalance(node, value);
+	}
+
+	template<typename T>
+	typename Set<T>::Node* Set<T>::RotateLeft(Node* node) {
+		Node* rightChild = node->right;
+		node->right = rightChild->left;
+		rightChild->left = node;
+
+		node->UpdateHeight();
+		rightChild->UpdateHeight();
+
+		if (m_Root == node) {
+			m_Root = rightChild;
+		}
+
+		return rightChild;
+	}
+
+	template<typename T>
+	typename Set<T>::Node* Set<T>::RotateRight(Node* node) {
+		Node* leftChild = node->left;
+		node->left = leftChild->right;
+		leftChild->right = node;
+
+		node->UpdateHeight();
+		leftChild->UpdateHeight();
+
+		if (m_Root == node) {
+			m_Root = leftChild;
+		}
+
+		return leftChild;
+	}
+
+	template<typename T>
+	typename Set<T>::Node* Set<T>::TryBalance(Node* node, const T& value) {
+		int balanceFactor = node->CalculateBalanceFactor();
+
+		if (balanceFactor > 1 && value < node->left->value) {
+			return RotateRight(node);
+		}
+
+		if (balanceFactor < -1 && value > node->right->value) {
+			return RotateLeft(node);
+		}
+
+		if (balanceFactor > 1 && value > node->left->value) {
+			node->left = RotateLeft(node->left);
+			return RotateRight(node);
+		}
+
+		if (balanceFactor < -1 && value < node->right->value) {
+			node->right = RotateRight(node->right);
+			return RotateLeft(node);
+		}
+
+		return node;
+	}
+
+	template<typename T>
 	inline int Set<T>::Node::CalculateBalanceFactor() const {
 		int balanceFactor = 0;
 
@@ -174,10 +189,51 @@ namespace GenericContainers {
 			this->height = 1;
 		}
 	}
-
+	
 	template<typename T>
 	inline void Set<T>::Remove(const T& value) {
+		m_Root = Remove(m_Root, value);
+	}
 
+	template<typename T>
+	typename Set<T>::Node* Set<T>::Remove(Node* node, const T& value) {
+		if (node == nullptr) {
+			return node;
+		}
+
+		if (value < node->value) {
+			node->left = Remove(node->left, value);
+		}
+		else if (value > node->value) {
+			node->right = Remove(node->right, value);
+		}
+		else {
+			if (node->left == nullptr || node->right == nullptr) {
+				Node* tmp = node->left ? node->left : node->right;
+				if (tmp == nullptr) {
+					tmp = node;
+					node = nullptr;
+				}
+				else {
+					*node = *tmp;
+				}
+				free(tmp);
+
+				--m_Size;
+			}
+			else {
+				Node* tmp = GetMinimumNode(node->right);
+				node->value = tmp->value;
+				node->right = Remove(node->right, tmp->value);
+			}
+		}
+
+		if (node == nullptr) {
+			return node;
+		}
+
+		node->UpdateHeight();
+		return TryBalance(node, value);
 	}
 
 	template<typename T>
@@ -209,6 +265,16 @@ namespace GenericContainers {
 		}
 
 		return result;
+	}
+
+	template<typename T>
+	typename Set<T>::Node* Set<T>::GetMinimumNode(Node* node) {
+		Node* current = node;
+		while (current != nullptr) {
+			current = current->left;
+		}
+
+		return current;
 	}
 
 	template<typename T>
