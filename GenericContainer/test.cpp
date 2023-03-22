@@ -9,11 +9,12 @@
 //#include <set>
 //
 //#include "Set.h"
+//#include "LightweightSet.h"
 //
 //#define ELEMENT_COUNT 10000
 //std::vector<int> arr;
 //
-////#define SPEED_TEST
+//#define SPEED_TEST
 //
 //void GenerateRandomValues() {
 //	for (int index = 0; index < ELEMENT_COUNT; ++index) {
@@ -79,10 +80,12 @@
 //		std::vector<int>{11, 23, 37, 50, 62, 75, 89});
 //#else
 //	std::set<int> stdSet;
-//	GenericContainers::Set<int> mySet;
+//	GenericContainers::Set<int> fastSet;
+//	GenericContainers::LightweightSet<int> lightSet;
 //
 //	double stdSetTime = 0;
-//	double mySetTime = 0;
+//	double fastSetTime = 0;
+//	double lightSetTime = 0;
 //
 //	GenerateRandomValues();
 //	for (int index = 0; index < ELEMENT_COUNT; ++index) {
@@ -93,20 +96,28 @@
 //		stdSetTime += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
 //
 //		begin = std::chrono::high_resolution_clock().now();
-//		mySet.Insert(arr[index]);
+//		fastSet.Insert(arr[index]);
 //		end = std::chrono::high_resolution_clock().now();
 //
-//		mySetTime += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+//		fastSetTime += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+//
+//		begin = std::chrono::high_resolution_clock().now();
+//		lightSet.Insert(arr[index]);
+//		end = std::chrono::high_resolution_clock().now();
+//
+//		lightSetTime += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
 //	}
 //
 //	std::cout << "std::set<int> average insertion time: " << std::setprecision(5) << std::fixed << stdSetTime / ELEMENT_COUNT << " microseconds\n";
-//	std::cout << "GenericContainers::Set<int> average insertion time: " << std::setprecision(5) << std::fixed << mySetTime / ELEMENT_COUNT << " microseconds\n";
+//	std::cout << "GenericContainers::Set<int> average insertion time: " << std::setprecision(5) << std::fixed << fastSetTime / ELEMENT_COUNT << " microseconds\n";
+//	std::cout << "GenericContainers::LightweightSet<int> average insertion time: " << std::setprecision(5) << std::fixed << lightSetTime / ELEMENT_COUNT << " microseconds\n";
 //	std::cout << "---------\n";
 //
 //	stdSetTime = 0;
-//	mySetTime = 0;
+//	fastSetTime = 0;
+//	lightSetTime = 0;
 //
-//	for (int index = 0; index < mySet.Size(); ++index) {
+//	for (int index = 0; index < fastSet.Size(); ++index) {
 //		auto begin = std::chrono::high_resolution_clock().now();
 //		std::set<int>::iterator it = stdSet.begin();
 //		std::advance(it, index);
@@ -116,23 +127,31 @@
 //		stdSetTime += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
 //
 //		begin = std::chrono::high_resolution_clock().now();
-//		mySet.Get(index);
+//		fastSet.Get(index);
 //		end = std::chrono::high_resolution_clock().now();
 //
-//		mySetTime += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+//		fastSetTime += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+//
+//		begin = std::chrono::high_resolution_clock().now();
+//		lightSet.Get(index);
+//		end = std::chrono::high_resolution_clock().now();
+//
+//		lightSetTime += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
 //	}
 //
 //	std::cout << "std::set<int> average Get time: " << std::setprecision(5) << std::fixed << stdSetTime / ELEMENT_COUNT << " microseconds\n";
-//	std::cout << "GenericContainers::Set<int> average Get time: " << std::setprecision(5) << std::fixed << mySetTime / ELEMENT_COUNT << " microseconds\n";
+//	std::cout << "GenericContainers::Set<int> average Get time: " << std::setprecision(5) << std::fixed << fastSetTime / ELEMENT_COUNT << " microseconds\n";
+//	std::cout << "GenericContainers::Lightweight<int> average Get time: " << std::setprecision(5) << std::fixed << lightSetTime / ELEMENT_COUNT << " microseconds\n";
 //	std::cout << "---------\n";
 //
 //	stdSetTime = 0;
-//	mySetTime = 0;
+//	fastSetTime = 0;
+//	lightSetTime = 0;
 //
 //	auto rng = std::default_random_engine{};
 //	std::shuffle(std::begin(arr), std::end(arr), rng);
-//	size_t initialSize = mySet.Size();
-//	for (int index = 0; index < mySet.Size(); ++index) {
+//	size_t initialSize = fastSet.Size();
+//	for (int index = 0; index < fastSet.Size(); ++index) {
 //		auto begin = std::chrono::high_resolution_clock().now();
 //		stdSet.erase(arr[index]);
 //		auto end = std::chrono::high_resolution_clock().now();
@@ -140,14 +159,26 @@
 //		stdSetTime += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
 //
 //		begin = std::chrono::high_resolution_clock().now();
-//		mySet.Remove(arr[index]);
+//		fastSet.Remove(arr[index]);
 //		end = std::chrono::high_resolution_clock().now();
 //
-//		mySetTime += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+//		fastSetTime += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+//
+//		begin = std::chrono::high_resolution_clock().now();
+//		lightSet.Remove(arr[index]);
+//		end = std::chrono::high_resolution_clock().now();
+//
+//		lightSetTime += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
 //	}
 //
 //	std::cout << "std::set<int> average erase/remove time: " << std::setprecision(5) << std::fixed << stdSetTime / initialSize << " microseconds\n";
-//	std::cout << "GenericContainers::Set<int> average erase/remove time: " << std::setprecision(5) << std::fixed << mySetTime / initialSize << " microseconds\n";
+//	std::cout << "GenericContainers::Set<int> average erase/remove time: " << std::setprecision(5) << std::fixed << fastSetTime / initialSize << " microseconds\n";
+//	std::cout << "GenericContainers::LightweightSet<int> average erase/remove time: " << std::setprecision(5) << std::fixed << lightSetTime / initialSize << " microseconds\n";
+//	std::cout << "--------\n";
+//
+//	std::cout << "std::set size: " << sizeof(stdSet) << std::endl;
+//	std::cout << "GenericContainers::Set size: " << sizeof(fastSet) << std::endl;
+//	std::cout << "GenericContainers::LightweightSet size: " << sizeof(lightSet) << std::endl;
 //#endif
 //	return 0;
 //}

@@ -35,7 +35,6 @@ namespace GenericContainers {
 		Set() : m_Size(0), m_Root(nullptr), m_DefaultValue(T()) {};
 		~Set();
 
-		void Create(const T& initialValue);
 		void Destroy();
 		void Insert(const T& value);
 		void Remove(const T& value);
@@ -56,12 +55,6 @@ namespace GenericContainers {
 	inline Set<T>::~Set() {
 		m_Size = 0;
 		delete m_Root;
-	}
-
-	template<typename T>
-	inline void Set<T>::Create(const T& initialValue) {
-		m_Root = new Node(initialValue);
-		m_Size = 1;
 	}
 
 	template<typename T>
