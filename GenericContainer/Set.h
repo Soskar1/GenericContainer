@@ -3,7 +3,6 @@
 
 #include <algorithm>
 #include <stdexcept>
-#include <cstdlib>
 
 namespace GenericContainers {
 	template<typename T>
@@ -211,7 +210,7 @@ namespace GenericContainers {
 				else {
 					*node = *tmp;
 				}
-				free(tmp);
+				delete tmp;
 
 				--m_Size;
 			}
@@ -294,11 +293,34 @@ namespace GenericContainers {
 
 	template<typename T>
 	inline void Set<T>::Edit(const T& oldValue, const T& newValue) {
+		if (!Contains(oldValue)) {
+			return;
+		}
 
+		m_Root = Remove(m_Root, oldValue);
+		m_Root = Insert(m_Root, newValue);
 	}
 
 	template<typename T>
 	inline bool Set<T>::Contains(const T& value) const {
+		if (m_Root == nullptr) {
+			return false;
+		}
+
+		Node* focusNode = m_Root;
+		while (focusNode != nullptr) {
+			if (value == focusNode->value) {
+				return true;
+			}
+
+			if (value < focusNode->value) {
+				focusNode = focusNode->left;
+			}
+			else if (value > focusNode->value) {
+				focusNode = focusNode->right;
+			}
+		}
+
 		return false;
 	}
 
@@ -309,7 +331,12 @@ namespace GenericContainers {
 
 	template<typename T>
 	inline void Set<T>::Clear() {
+		m_Size = 0;
+		
+		delete m_Root->left;
+		delete m_Root->right;
 
+		m_Root = nullptr;
 	}
 }
 #endif
