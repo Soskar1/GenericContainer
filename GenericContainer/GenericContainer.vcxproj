@@ -19,10 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="LightweightSetExample.cpp" />
+    <ClCompile Include="SetExample.cpp" />
     <ClCompile Include="test.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="LightweightSet.h" />
     <ClInclude Include="Set.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

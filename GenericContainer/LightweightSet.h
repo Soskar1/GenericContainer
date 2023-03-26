@@ -1,7 +1,6 @@
 #ifndef LIGHTWEIGHTSET_H
 #define LIGHTWEIGHTSET_H
 
-#include <cstdlib>
 #include <stdexcept>
 
 namespace GenericContainers {
@@ -12,6 +11,8 @@ namespace GenericContainers {
 
 		T* m_Array;
 		size_t m_Size;
+
+		void Resize(const size_t& newSize);
 	public:
 		LightweightSet();
 		~LightweightSet();
@@ -29,12 +30,12 @@ namespace GenericContainers {
 	template<typename T>
 	inline LightweightSet<T>::LightweightSet() {
 		m_Size = 0;
-		m_Array = (T*)malloc(sizeof(T));
+		m_Array = new T[1];
 	}
 
 	template<typename T>
 	inline LightweightSet<T>::~LightweightSet() {
-		free(m_Array);
+		delete[] m_Array;
 	}
 
 	template<typename T>
@@ -56,11 +57,22 @@ namespace GenericContainers {
 			return;
 		}
 
-		++m_Size;
-		m_Array = (T*)realloc(m_Array, m_Size * sizeof(T));
-
+		Resize(m_Size + 1);
 		m_Array[m_Size - 1] = value;
+
 		Sort();
+	}
+
+	template<typename T>
+	inline void LightweightSet<T>::Resize(const size_t& newSize) {
+		T* newArray = new T[newSize];
+		for (int i = 0; i < m_Size; ++i) {
+			newArray[i] = m_Array[i];
+		}
+
+		delete[] m_Array;
+		m_Array = newArray;
+		m_Size = newSize;
 	}
 
 	template<typename T>
