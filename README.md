@@ -1,2 +1,2 @@
 # GenericContainer
-Store whatever you want!
+Store whatever you want! (university project)
