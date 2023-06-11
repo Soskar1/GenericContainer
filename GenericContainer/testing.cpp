@@ -7,23 +7,24 @@ int main() {
 
 	Set<int> mySet;
 
-	mySet.Insert(5);
-	mySet.Insert(8567);
-	mySet.Insert(5456);
-	mySet.Insert(13);
-	mySet.Insert(856);
-
-	mySet.Remove(8567);
-	mySet.Remove(13);
-
+	mySet.Insert(2);
+	mySet.Insert(2);
+	mySet.Insert(2);
+	mySet.Insert(4);
+	mySet.Insert(6);
+	mySet.Insert(6);
+	mySet.Insert(6);
+	mySet.Insert(6);
+	mySet.Insert(7);
+	mySet.Insert(8);
+	mySet.Insert(8);
+	mySet.Insert(12);
 	mySet.Insert(15);
-	mySet.Insert(549);
 	mySet.Insert(15);
 
-	mySet.Remove(856);
+	mySet.Clear();
 
-	mySet.Remove(15);
-	mySet.Remove(15);
+	std::cout << mySet.Contains(12);
 
 	return 0;
 }

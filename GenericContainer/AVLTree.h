@@ -34,14 +34,18 @@ namespace Tree {
 		Node* Remove(Node* node, const T& value);
 
 		Node* GetMinimumNode(Node* node) const;
+
+		T InOrderTraversal(Node* node, int& index);
 	public:
 		AVLTree();
 		~AVLTree();
 
 		void Insert(const T& value);
 		void Remove(const T& value);
+		void Remove(size_t index);
 		void Edit(const T& oldValue, const T& newValue);
 
+		T Get(int index);
 		bool Contains(const T& value) const;
 
 		size_t Size() const;
@@ -244,6 +248,27 @@ namespace Tree {
 	}
 
 	template<typename T>
+	inline T AVLTree<T>::InOrderTraversal(Node* node, int& index) {
+		T result = T();
+
+		if (result == T() && node->left != nullptr) {
+			result = InOrderTraversal(node->left, index);
+		}
+
+		index -= node->size;
+
+		if (result == T() && index < 0) {
+			return node->value;
+		}
+
+		if (result == T() && node->right != nullptr) {
+			result = InOrderTraversal(node->right, index);
+		}
+
+		return result;
+	}
+
+	template<typename T>
 	inline AVLTree<T>::AVLTree()
 	{
 		m_Root = nullptr;
@@ -269,6 +294,16 @@ namespace Tree {
 	}
 
 	template<typename T>
+	inline void AVLTree<T>::Remove(size_t index)
+	{
+		if (index < 0 || index >= m_Size) {
+			throw std::out_of_range("out_of_range");
+		}
+
+		Remove(Get(index));
+	}
+
+	template<typename T>
 	inline void AVLTree<T>::Edit(const T& oldValue, const T& newValue)
 	{
 		if (!Contains(oldValue)) {
@@ -277,6 +312,16 @@ namespace Tree {
 
 		m_Root = Remove(m_Root, oldValue);
 		m_Root = Insert(m_Root, newValue);
+	}
+
+	template<typename T>
+	inline T AVLTree<T>::Get(int index)
+	{
+		if (index < 0 || index >= m_Size || m_Size == 0) {
+			throw std::out_of_range("out_of_range");
+		}
+
+		return InOrderTraversal(m_Root, index);
 	}
 
 	template<typename T>
