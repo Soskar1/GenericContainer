@@ -317,7 +317,7 @@ namespace Tree {
 	template<typename T>
 	inline T AVLTree<T>::Get(int index)
 	{
-		if (index < 0 || index >= m_Size || m_Size == 0) {
+		if (index < 0 || index >= m_Size) {
 			throw std::out_of_range("out_of_range");
 		}
 

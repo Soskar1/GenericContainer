@@ -3,6 +3,8 @@
 
 #include <stdexcept>
 
+#define INITIAL_CAPACITY 100
+
 namespace GenericContainers {
 	template<typename T>
 	class LightweightSet {
@@ -11,8 +13,9 @@ namespace GenericContainers {
 
 		T* m_Array;
 		size_t m_Size;
+		size_t m_Capacity;
 
-		void Resize(const size_t& newSize);
+		void Resize(const size_t& newCapacity);
 		int GetIndex(const T& value) const;
 	public:
 		LightweightSet();
@@ -39,7 +42,8 @@ namespace GenericContainers {
 	template<typename T>
 	inline LightweightSet<T>::LightweightSet() {
 		m_Size = 0;
-		m_Array = new T[1];
+		m_Capacity = INITIAL_CAPACITY;
+		m_Array = new T[INITIAL_CAPACITY];
 	}
 
 	template<typename T>
@@ -62,31 +66,35 @@ namespace GenericContainers {
 
 	template<typename T>
 	inline void LightweightSet<T>::Insert(const T& value) {
-		if (Contains(value)) {
-			return;
+		if (m_Size == m_Capacity) {
+			Resize(m_Capacity * 2);
 		}
 
-		Resize(m_Size + 1);
-		m_Array[m_Size - 1] = value;
+		m_Array[m_Size] = value;
+		++m_Size;
 
 		Sort();
 	}
 
 	template<typename T>
-	inline void LightweightSet<T>::Resize(const size_t& newSize) {
-		T* newArray = new T[newSize];
+	inline void LightweightSet<T>::Resize(const size_t& newCapacity) {
+		T* newArray = new T[newCapacity];
 		for (size_t i = 0; i < m_Size; ++i) {
 			newArray[i] = m_Array[i];
 		}
 
 		delete[] m_Array;
 		m_Array = newArray;
-		m_Size = newSize;
+		m_Capacity = newCapacity;
 	}
 
 	template<typename T>
 	inline void LightweightSet<T>::Remove(const size_t& index)
 	{
+		if (index < 0 || index >= m_Size) {
+			throw std::out_of_range("out_of_range");
+		}
+
 		for (size_t i = index; i < m_Size - 1; ++i) {
 			m_Array[i] = m_Array[i + 1];
 		}
@@ -195,6 +203,9 @@ namespace GenericContainers {
 	template<typename T>
 	inline void LightweightSet<T>::Clear() {
 		m_Size = 0;
+
+		delete m_Array;
+		m_Array = new T[m_Capacity];
 	}
 
 	template<typename T>
