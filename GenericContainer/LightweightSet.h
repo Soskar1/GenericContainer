@@ -13,15 +13,24 @@ namespace GenericContainers {
 		size_t m_Size;
 
 		void Resize(const size_t& newSize);
+		int GetIndex(const T& value) const;
 	public:
 		LightweightSet();
 		~LightweightSet();
 
 		void Insert(const T& value);
+		
+		void Remove(const size_t& index);
 		void Remove(const T& value);
+		void RemoveFirst();
+		void RemoveLast();
+
 		T Get(const size_t& index) const;
-		size_t GetIndex(const T& value) const;
+		T GetFirst();
+		T GetLast();
+
 		bool Contains(const T& value) const;
+
 		void Edit(const T& oldValue, const T& newValue);
 		void Clear();
 		size_t Size() const;
@@ -66,7 +75,7 @@ namespace GenericContainers {
 	template<typename T>
 	inline void LightweightSet<T>::Resize(const size_t& newSize) {
 		T* newArray = new T[newSize];
-		for (int i = 0; i < m_Size; ++i) {
+		for (size_t i = 0; i < m_Size; ++i) {
 			newArray[i] = m_Array[i];
 		}
 
@@ -76,16 +85,34 @@ namespace GenericContainers {
 	}
 
 	template<typename T>
+	inline void LightweightSet<T>::Remove(const size_t& index)
+	{
+		for (size_t i = index; i < m_Size - 1; ++i) {
+			m_Array[i] = m_Array[i + 1];
+		}
+
+		--m_Size;
+	}
+
+	template<typename T>
 	inline void LightweightSet<T>::Remove(const T& value) {
-		size_t index = GetIndex(value);
+		int index = GetIndex(value);
 
 		if (index != -1) {
-			for (int i = index; i < m_Size - 1; ++i) {
-				m_Array[i] = m_Array[i + 1];
-			}
-
-			--m_Size;
+			Remove(size_t(index));
 		}
+	}
+
+	template<typename T>
+	inline void LightweightSet<T>::RemoveFirst()
+	{
+		Remove(size_t(0));
+	}
+
+	template<typename T>
+	inline void LightweightSet<T>::RemoveLast()
+	{
+		Remove(m_Size - 1);
 	}
 
 	template<typename T>
@@ -98,10 +125,22 @@ namespace GenericContainers {
 	}
 
 	template<typename T>
-	inline size_t LightweightSet<T>::GetIndex(const T& value) const {
-		size_t low = 0;
-		size_t high = m_Size - 1;
-		size_t mid = 0;
+	inline T LightweightSet<T>::GetFirst()
+	{
+		return Get(0);
+	}
+
+	template<typename T>
+	inline T LightweightSet<T>::GetLast()
+	{
+		return Get(m_Size - 1);
+	}
+
+	template<typename T>
+	inline int LightweightSet<T>::GetIndex(const T& value) const {
+		int low = 0;
+		int high = m_Size - 1;
+		int mid = 0;
 
 		while (low <= high) {
 			mid = (low + high) / 2;
@@ -145,7 +184,7 @@ namespace GenericContainers {
 
 	template<typename T>
 	inline void LightweightSet<T>::Edit(const T& oldValue, const T& newValue) {
-		size_t index = GetIndex(oldValue);
+		int index = GetIndex(oldValue);
 
 		if (index != -1) {
 			Remove(oldValue);

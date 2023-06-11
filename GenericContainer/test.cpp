@@ -1,184 +1,204 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include <iostream>
-#include <cassert>
-#include <vector>
-#include <algorithm>
-#include <functional>
-#include <chrono>
-#include <iomanip>
-#include <random>
-#include <set>
 
-#include "Set.h"
+
+// other includes and definitions
+
 #include "LightweightSet.h"
 
-#define ELEMENT_COUNT 10000
-std::vector<int> arr;
+using namespace std;
+using namespace GenericContainers;
 
-#define SPEED_TEST
+// define your container here
+typedef LightweightSet<int> tADT;
 
-void GenerateRandomValues() {
-	for (int index = 0; index < ELEMENT_COUNT; ++index) {
-		arr.push_back(rand());
+// define your value here		
+typedef int tValue;
+
+
+int errorCode;
+
+// throw the following class if function is not implemented
+class NotImplementedException {
+};
+// throw the following class if index/position out of bounds
+class OutOfBoundsException {
+};
+
+
+
+void createADT(tADT& adt) {
+	/* YOUR CODE HERE OR EMPTY */
+}
+void destroyADT(tADT& adt) {
+	/* YOUR CODE HERE OR EMPTY */
+}
+
+
+
+void add(tADT& adt, tValue value, int pos) {
+	/* YOUR CODE HERE */
+	throw NotImplementedException();
+}
+void addValue(tADT& adt, tValue value) {
+	adt.Insert(value);
+}
+void addFirst(tADT& adt, tValue value) {
+	/* YOUR CODE HERE */
+	throw NotImplementedException();
+}
+void addLast(tADT& adt, tValue value) {
+	/* YOUR CODE HERE */
+	throw NotImplementedException();
+}
+
+
+
+void remove(tADT& adt, int pos) {
+	adt.Remove(size_t(pos));
+}
+void removeValue(tADT& adt, tValue value) {
+	adt.Remove(value);
+}
+void removeFirst(tADT& adt) {
+	adt.RemoveFirst();
+}
+void removeLast(tADT& adt) {
+	adt.RemoveLast();
+}
+
+
+
+tValue get(tADT& adt, int pos) {
+	return adt.Get(pos);
+}
+bool getValue(tADT& adt, tValue value) {
+	return adt.Contains(value);
+}
+tValue getFirst(tADT& adt) {
+	return adt.GetFirst();
+}
+tValue getLast(tADT& adt) {
+	return adt.GetLast();
+}
+
+
+
+int getSize(tADT& adt) {
+	return adt.Size();
+}
+int getMaxSize(tADT& adt) {
+	return adt.Size();
+}
+
+// print all values of your ADT in ascending order
+// all values should be in a single line separated by single spaces	
+void printADT(tADT& adt) {
+
+	for (size_t i = 0; i < adt.Size(); ++i) {
+		if (i == adt.Size() - 1) {
+			cout << adt.Get(i);
+		}
+		else {
+			cout << adt.Get(i) << " ";
+		}
 	}
 }
 
-void SetInsertionTest(const std::vector<int>& arr) {
-	GenericContainers::Set<int> set;
-	std::vector<int> tmp = arr;
 
-	for (int index = 0; index < tmp.size(); ++index) {
-		set.Insert(tmp[index]);
-	}
-
-	std::set<int> stdSet(tmp.begin(), tmp.end());
-	tmp.assign(stdSet.begin(), stdSet.end());
-
-	for (int index = 0; index < tmp.size(); ++index) {
-		assert(set.Get(index) == tmp[index]);
-	}
-}
-
-void SetRemoveTest(const std::vector<int>& arr, const std::vector<int>& elementsToRemove) {
-	GenericContainers::Set<int> set;
-	std::vector<int> tmp = arr;
-
-	for (int index = 0; index < tmp.size(); ++index) {
-		set.Insert(tmp[index]);
-	}
-
-	std::set<int> stdSet(tmp.begin(), tmp.end());
-
-	for (int index = 0; index < elementsToRemove.size(); ++index) {
-		set.Remove(elementsToRemove[index]);
-		stdSet.erase(elementsToRemove[index]);
-	}
-
-	tmp.assign(stdSet.begin(), stdSet.end());
-
-	for (int index = 0; index < tmp.size(); ++index) {
-		assert(set.Get(index) == tmp[index]);
-	}
-}
+/* DO NOT MODIFY CODE BELOW */
+class ErrorCodeException {
+};
 
 int main() {
-#ifndef SPEED_TEST
-	SetInsertionTest(std::vector<int>{7, 6, 5});
-	SetInsertionTest(std::vector<int>{10, 5, 15, 3, 7, 12, 20});
-	SetInsertionTest(std::vector<int>{1, 2, 3, 4, 5});
-	SetInsertionTest(std::vector<int>{5, 4, 3, 2, 1});
-	SetInsertionTest(std::vector<int>{1, 3, 2, 5, 4});
-	SetInsertionTest(std::vector<int>{50, 30, 70, 20, 40, 60, 80, 10, 25, 35, 45, 55, 65, 75, 90, 5, 15, 23, 27, 33, 37, 43, 47, 53, 57, 63, 67, 73, 77, 85, 95});
-	SetInsertionTest(std::vector<int>{100, 50, 150, 25, 75, 125, 175, 12, 37, 62, 87, 112, 137, 162, 187, 6, 18, 31, 43, 56, 68, 81, 93, 106, 118, 131, 143, 156, 168, 181, 193});
-	SetInsertionTest(std::vector<int>{5, 5, 6});
+	try {
+		errorCode = 0;
+		tADT adt;
+		createADT(adt);
 
-	SetRemoveTest(std::vector<int>{5, 6, 7}, std::vector<int>{5});
-	SetRemoveTest(std::vector<int>{1, 2, 3, 4}, std::vector<int>{3});
-	SetRemoveTest(std::vector<int>{1, 2, 3, 4, 5}, std::vector<int>{3, 4});
-	SetRemoveTest(std::vector<int>{1, 2, 3, 4, 5}, std::vector<int>{1, 2, 3, 4, 5});
-
-	SetRemoveTest(std::vector<int>{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100},
-		std::vector<int>{11, 23, 37, 50, 62, 75, 89});
-#else
-	std::set<int> stdSet;
-	GenericContainers::Set<int> fastSet;
-	GenericContainers::LightweightSet<int> lightSet;
-
-	double stdSetTime = 0;
-	double fastSetTime = 0;
-	double lightSetTime = 0;
-
-	GenerateRandomValues();
-	for (int index = 0; index < ELEMENT_COUNT; ++index) {
-		auto begin = std::chrono::high_resolution_clock().now();
-		stdSet.insert(arr[index]);
-		auto end = std::chrono::high_resolution_clock().now();
-
-		stdSetTime += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
-
-		begin = std::chrono::high_resolution_clock().now();
-		fastSet.Insert(arr[index]);
-		end = std::chrono::high_resolution_clock().now();
-
-		fastSetTime += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
-
-		begin = std::chrono::high_resolution_clock().now();
-		lightSet.Insert(arr[index]);
-		end = std::chrono::high_resolution_clock().now();
-
-		lightSetTime += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+		int x = -1;
+		while (1) {
+			cin >> x;
+			if (x == 0) {
+				destroyADT(adt);
+				break;
+			}
+			else {
+				tValue val;
+				int pos;
+				switch (x) {
+				case 11:
+					printADT(adt);
+					break;
+				case 12:
+					cout << getSize(adt) << endl;
+					break;
+				case 13:
+					cout << getMaxSize(adt) << endl;
+					break;
+				case 21:
+					cout << getFirst(adt) << endl;
+					break;
+				case 22:
+					cout << getLast(adt) << endl;
+					break;
+				case 23:
+					cin >> pos;
+					cout << get(adt, pos) << endl;
+					break;
+				case 24:
+					cin >> val;
+					cout << getValue(adt, val) << endl;
+					break;
+				case 31:
+					cin >> val;
+					addFirst(adt, val);
+					break;
+				case 32:
+					cin >> val;
+					addLast(adt, val);
+					break;
+				case 33:
+					cin >> val >> pos;
+					add(adt, val, pos);
+					break;
+				case 34:
+					cin >> val;
+					addValue(adt, val);
+					break;
+				case 41:
+					removeFirst(adt);
+					break;
+				case 42:
+					removeLast(adt);
+					break;
+				case 43:
+					cin >> pos;
+					remove(adt, pos);
+					break;
+				case 44:
+					cin >> val;
+					removeValue(adt, val);
+					break;
+				}
+			}
+		}
+		if (errorCode) {
+			throw OutOfBoundsException();
+		}
 	}
-
-	std::cout << "std::set<int> average insertion time: " << std::setprecision(5) << std::fixed << stdSetTime / ELEMENT_COUNT << " microseconds\n";
-	std::cout << "GenericContainers::Set<int> average insertion time: " << std::setprecision(5) << std::fixed << fastSetTime / ELEMENT_COUNT << " microseconds\n";
-	std::cout << "GenericContainers::LightweightSet<int> average insertion time: " << std::setprecision(5) << std::fixed << lightSetTime / ELEMENT_COUNT << " microseconds\n";
-	std::cout << "---------\n";
-
-	stdSetTime = 0;
-	fastSetTime = 0;
-	lightSetTime = 0;
-
-	for (int index = 0; index < fastSet.Size(); ++index) {
-		auto begin = std::chrono::high_resolution_clock().now();
-		std::set<int>::iterator it = stdSet.begin();
-		std::advance(it, index);
-		int x = *it;
-		auto end = std::chrono::high_resolution_clock().now();
-
-		stdSetTime += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
-
-		begin = std::chrono::high_resolution_clock().now();
-		fastSet.Get(index);
-		end = std::chrono::high_resolution_clock().now();
-
-		fastSetTime += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
-
-		begin = std::chrono::high_resolution_clock().now();
-		lightSet.Get(index);
-		end = std::chrono::high_resolution_clock().now();
-
-		lightSetTime += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+	catch (NotImplementedException& e) {
+		return 2018;
 	}
-
-	std::cout << "std::set<int> average Get time: " << std::setprecision(5) << std::fixed << stdSetTime / ELEMENT_COUNT << " microseconds\n";
-	std::cout << "GenericContainers::Set<int> average Get time: " << std::setprecision(5) << std::fixed << fastSetTime / ELEMENT_COUNT << " microseconds\n";
-	std::cout << "GenericContainers::Lightweight<int> average Get time: " << std::setprecision(5) << std::fixed << lightSetTime / ELEMENT_COUNT << " microseconds\n";
-	std::cout << "---------\n";
-
-	stdSetTime = 0;
-	fastSetTime = 0;
-	lightSetTime = 0;
-
-	auto rng = std::default_random_engine{};
-	std::shuffle(std::begin(arr), std::end(arr), rng);
-	size_t initialSize = fastSet.Size();
-	for (int index = 0; index < fastSet.Size(); ++index) {
-		auto begin = std::chrono::high_resolution_clock().now();
-		stdSet.erase(arr[index]);
-		auto end = std::chrono::high_resolution_clock().now();
-
-		stdSetTime += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
-
-		begin = std::chrono::high_resolution_clock().now();
-		fastSet.Remove(arr[index]);
-		end = std::chrono::high_resolution_clock().now();
-
-		fastSetTime += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
-
-		begin = std::chrono::high_resolution_clock().now();
-		lightSet.Remove(arr[index]);
-		end = std::chrono::high_resolution_clock().now();
-
-		lightSetTime += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+	catch (ErrorCodeException& e) {
+		return 1234;
 	}
-
-	std::cout << "std::set<int> average erase/remove time: " << std::setprecision(5) << std::fixed << stdSetTime / initialSize << " microseconds\n";
-	std::cout << "GenericContainers::Set<int> average erase/remove time: " << std::setprecision(5) << std::fixed << fastSetTime / initialSize << " microseconds\n";
-	std::cout << "GenericContainers::LightweightSet<int> average erase/remove time: " << std::setprecision(5) << std::fixed << lightSetTime / initialSize << " microseconds\n";
-	std::cout << "--------\n";
-
-	std::cout << "std::set size: " << sizeof(stdSet) << std::endl;
-	std::cout << "GenericContainers::Set size: " << sizeof(fastSet) << std::endl;
-	std::cout << "GenericContainers::LightweightSet size: " << sizeof(lightSet) << std::endl;
-#endif
+	catch (OutOfBoundsException& e) {
+		return 4321;
+	}
+	catch (...) {
+		return -1;
+	}
 	return 0;
 }

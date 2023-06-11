@@ -26,20 +26,30 @@ namespace GenericContainers {
 		Node* Insert(Node* node, const T& value);
 		Node* Remove(Node* node, const T& value);
 		Node* GetMinimumNode(Node* node);
+
 		T InOrderTraversal(Node* node, size_t& index);
 
 		Node* m_Root;
 		size_t m_Size;
 		T m_DefaultValue;
 	public:
-		Set() : m_Size(0), m_Root(nullptr), m_DefaultValue(T()) {};
+		Set() : m_Root(nullptr), m_Size(0), m_DefaultValue(T()) {};
 		~Set();
 
 		void Insert(const T& value);
+
+		void Remove(size_t index);
 		void Remove(const T& value);
+		void RemoveFirst();
+		void RemoveLast();
+
 		T Get(size_t index);
-		void Edit(const T& oldValue, const T& newValue);
+		T GetFirst();
+		T GetLast();
+
 		bool Contains(const T& value) const;
+
+		void Edit(const T& oldValue, const T& newValue);
 		size_t Size() const;
 		void Clear();
 	};
@@ -170,8 +180,30 @@ namespace GenericContainers {
 	}
 	
 	template<typename T>
+	inline void Set<T>::Remove(size_t index)
+	{
+		if (index < 0 || index >= m_Size) {
+			throw std::out_of_range("out_of_range");
+		}
+
+		m_Root = Remove(m_Root, InOrderTraversal(m_Root, index));
+	}
+
+	template<typename T>
 	inline void Set<T>::Remove(const T& value) {
 		m_Root = Remove(m_Root, value);
+	}
+
+	template<typename T>
+	inline void Set<T>::RemoveFirst()
+	{
+		Remove(size_t(0));
+	}
+
+	template<typename T>
+	inline void Set<T>::RemoveLast()
+	{
+		Remove(size_t(m_Size - 1));
 	}
 
 	template<typename T>
@@ -238,11 +270,23 @@ namespace GenericContainers {
 
 	template<typename T>
 	inline T Set<T>::Get(size_t index) {
-		if (index >= m_Size) {
+		if (index < 0 || index >= m_Size) {
 			throw std::out_of_range("out_of_range");
 		}
 
 		return InOrderTraversal(m_Root, index);
+	}
+
+	template<typename T>
+	inline T Set<T>::GetFirst()
+	{
+		return Get(0);
+	}
+
+	template<typename T>
+	inline T Set<T>::GetLast()
+	{
+		return Get(m_Size - 1);
 	}
 
 	template<typename T>

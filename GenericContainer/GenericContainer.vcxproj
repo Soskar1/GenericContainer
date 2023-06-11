@@ -19,9 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="LightweightSetExample.cpp" />
-    <ClCompile Include="SetExample.cpp" />
-    <ClCompile Include="test.cpp" />
+    <ClCompile Include="testing.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LightweightSet.h" />

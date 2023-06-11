@@ -4,7 +4,6 @@
 
 int main()
 {
-#pragma region Int Set
     GenericContainers::LightweightSet<int> intSet;
     intSet.Insert(5);
     intSet.Insert(20);
@@ -42,8 +41,7 @@ int main()
     std::cout << "size: " << intSet.Size() << std::endl;
     std::cout << "set contains 1: " << intSet.Contains(1) << std::endl;
     std::cout << "set contains 40: " << intSet.Contains(40) << std::endl;
-#pragma endregion
-#pragma region String Set
+
     GenericContainers::LightweightSet<std::string> stringSet;
 
     stringSet.Insert("test");
@@ -53,16 +51,15 @@ int main()
     std::cout << "size: " << stringSet.Size() << std::endl;
     std::cout << "set contains \"dog\": " << stringSet.Contains("dog") << std::endl;
     std::cout << "set contains \"apple\": " << stringSet.Contains("apple") << std::endl;
-    std::cout << "set[0] = " << stringSet.Get(0) << std::endl;
+    std::cout << "set[0] = " << stringSet.GetFirst() << std::endl;
     std::cout << "set[1] = " << stringSet.Get(1) << std::endl;
-    std::cout << "set[2] = " << stringSet.Get(2) << std::endl;
+    std::cout << "set[2] = " << stringSet.GetLast() << std::endl;
 
     stringSet.Remove("cat");
     std::cout << "size: " << stringSet.Size() << std::endl;
     std::cout << "set contains \"cat\": " << stringSet.Contains("cat") << std::endl;
-    std::cout << "set[0] = " << stringSet.Get(0) << std::endl;
-    std::cout << "set[1] = " << stringSet.Get(1) << std::endl;
-#pragma endregion
+    std::cout << "set[0] = " << stringSet.GetFirst() << std::endl;
+    std::cout << "set[1] = " << stringSet.GetLast() << std::endl;
 
     return 0;
 }

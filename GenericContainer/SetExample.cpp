@@ -4,7 +4,6 @@
 
 int main()
 {
-#pragma region Int Set
     GenericContainers::Set<int> intSet;
     intSet.Insert(5);
     intSet.Insert(20);
@@ -42,8 +41,7 @@ int main()
     std::cout << "size: " << intSet.Size() << std::endl;
     std::cout << "set contains 1: " << intSet.Contains(1) << std::endl;
     std::cout << "set contains 40: " << intSet.Contains(40) << std::endl;
-#pragma endregion
-#pragma region String Set
+
     GenericContainers::Set<std::string> stringSet;
 
     stringSet.Insert("test");
@@ -62,7 +60,6 @@ int main()
     std::cout << "set contains \"cat\": " << stringSet.Contains("cat") << std::endl;
     std::cout << "set[0] = " << stringSet.Get(0) << std::endl;
     std::cout << "set[1] = " << stringSet.Get(1) << std::endl;
-#pragma endregion
 
     return 0;
 }
