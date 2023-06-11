@@ -5,25 +5,25 @@
 int main() {
 	using namespace GenericContainers;
 
-	LightweightSet<int> mySet;
+	Set<int> mySet;
 
-	mySet.Insert(4);
-	mySet.Insert(4);
-	mySet.Insert(4);
-	mySet.Insert(4);
-	mySet.Insert(4);
-	mySet.Insert(4);
-	mySet.Insert(2);
-	mySet.Insert(9);
-	mySet.Insert(3);
+	mySet.Insert(5);
+	mySet.Insert(8567);
+	mySet.Insert(5456);
+	mySet.Insert(13);
+	mySet.Insert(856);
 
-	for (int i = 0; i < mySet.Size(); ++i) {
-		std::cout << mySet.Get(i) << " ";
-	}
+	mySet.Remove(8567);
+	mySet.Remove(13);
 
-	std::cout << std::endl;
+	mySet.Insert(15);
+	mySet.Insert(549);
+	mySet.Insert(15);
 
-	std::cout << mySet.GetLast();
+	mySet.Remove(856);
+
+	mySet.Remove(15);
+	mySet.Remove(15);
 
 	return 0;
 }

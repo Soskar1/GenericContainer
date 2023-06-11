@@ -7,18 +7,12 @@
 
 namespace Tree {
 	template <typename T>
-	struct GetValue {
-		T operator()(const T& value) const {
-			return value;
-		}
-	};
-
-	template <typename T, class ValueExtraction = GetValue<T>>
 	class AVLTree {
 	private:
 		struct Node {
-			std::vector<T> values;
+			T value;
 			int height;
+			size_t size;
 			Node* left;
 			Node* right;
 
@@ -32,7 +26,6 @@ namespace Tree {
 
 		Node* m_Root;
 		size_t m_Size;
-		ValueExtraction m_ValueExtraction;
 
 		Node* RotateLeft(Node* node);
 		Node* RotateRight(Node* node);
@@ -43,45 +36,42 @@ namespace Tree {
 		Node* GetMinimumNode(Node* node) const;
 	public:
 		AVLTree();
-		AVLTree(ValueExtraction valueExtraction);
 		~AVLTree();
 
 		void Insert(const T& value);
 		void Remove(const T& value);
 		void Edit(const T& oldValue, const T& newValue);
 
-		template<typename I = T>
-		T Search(const I& value) const;
-
 		bool Contains(const T& value) const;
 
 		size_t Size() const;
 	};
 
-	template<typename T, class ValueExtraction>
-	inline AVLTree<T, ValueExtraction>::Node::Node(const T& value)
+	template<typename T>
+	inline AVLTree<T>::Node::Node(const T& value)
 	{
-		values.push_back(value);
+		this->value = value;
 		height = 1;
+		size = 1;
 		left = nullptr;
 		right = nullptr;
 	}
 
-	template<typename T, class ValueExtraction>
-	inline AVLTree<T, ValueExtraction>::Node::~Node()
+	template<typename T>
+	inline AVLTree<T>::Node::~Node()
 	{
 		delete left;
 		delete right;
 	}
 
-	template<typename T, class ValueExtraction>
-	int AVLTree<T, ValueExtraction>::Node::CalculateBalanceFactor() const
+	template<typename T>
+	int AVLTree<T>::Node::CalculateBalanceFactor() const
 	{
 		return left->GetHeight() - right->GetHeight();
 	}
 
-	template<typename T, class ValueExtraction>
-	inline int AVLTree<T, ValueExtraction>::Node::GetHeight() const
+	template<typename T>
+	inline int AVLTree<T>::Node::GetHeight() const
 	{
 		if (this == nullptr)
 			return 0;
@@ -89,14 +79,14 @@ namespace Tree {
 		return height;
 	}
 
-	template<typename T, class ValueExtraction>
-	inline void AVLTree<T, ValueExtraction>::Node::UpdateHeight()
+	template<typename T>
+	inline void AVLTree<T>::Node::UpdateHeight()
 	{
 		height = std::max(left->GetHeight(), right->GetHeight()) + 1;
 	}
 
-	template<typename T, class ValueExtraction>
-	typename AVLTree<T, ValueExtraction>::Node* AVLTree<T, ValueExtraction>::RotateLeft(Node* node)
+	template<typename T>
+	typename AVLTree<T>::Node* AVLTree<T>::RotateLeft(Node* node)
 	{
 		Node* rightNode = node->right;
 		Node* rightLeftNode = rightNode->left;
@@ -110,8 +100,8 @@ namespace Tree {
 		return rightNode;
 	}
 
-	template<typename T, class ValueExtraction>
-	typename AVLTree<T, ValueExtraction>::Node* AVLTree<T, ValueExtraction>::RotateRight(Node* node)
+	template<typename T>
+	typename AVLTree<T>::Node* AVLTree<T>::RotateRight(Node* node)
 	{
 		Node* leftNode = node->left;
 		Node* leftRightNode = leftNode->right;
@@ -125,8 +115,8 @@ namespace Tree {
 		return leftNode;
 	}
 
-	template<typename T, class ValueExtraction>
-	typename AVLTree<T, ValueExtraction>::Node* AVLTree<T, ValueExtraction>::Insert(Node* node, const T& value)
+	template<typename T>
+	typename AVLTree<T>::Node* AVLTree<T>::Insert(Node* node, const T& value)
 	{
 		if (node == nullptr) {
 			node = new Node(value);
@@ -134,15 +124,15 @@ namespace Tree {
 			return node;
 		}
 
-		if (m_ValueExtraction(value) < m_ValueExtraction(node->values[0])) {
+		if (value < node->value) {
 			node->left = Insert(node->left, value);
 		}
-		else if (m_ValueExtraction(value) > m_ValueExtraction(node->values[0])) {
+		else if (value > node->value) {
 			node->right = Insert(node->right, value);
 		}
 		else {
-			node->values.push_back(value);
 			++m_Size;
+			++node->size;
 			return node;
 		}
 
@@ -150,20 +140,20 @@ namespace Tree {
 
 		int balanceFactor = node->CalculateBalanceFactor();
 
-		if (balanceFactor > 1 && m_ValueExtraction(value) < m_ValueExtraction(node->left->values[0])) {
+		if (balanceFactor > 1 && value < node->left->value) {
 			return RotateRight(node);
 		}
 
-		if (balanceFactor < -1 && m_ValueExtraction(value) > m_ValueExtraction(node->right->values[0])) {
+		if (balanceFactor < -1 && value > node->right->value) {
 			return RotateLeft(node);
 		}
 
-		if (balanceFactor > 1 && m_ValueExtraction(value) > m_ValueExtraction(node->left->values[0])) {
+		if (balanceFactor > 1 && value > node->left->value) {
 			node->left = RotateLeft(node->left);
 			return RotateRight(node);
 		}
 
-		if (balanceFactor < -1 && m_ValueExtraction(value) < m_ValueExtraction(node->right->values[0])) {
+		if (balanceFactor < -1 && value < node->right->value) {
 			node->right = RotateRight(node->right);
 			return RotateLeft(node);
 		}
@@ -171,29 +161,23 @@ namespace Tree {
 		return node;
 	}
 
-	template<typename T, class ValueExtraction>
-	typename AVLTree<T, ValueExtraction>::Node* AVLTree<T, ValueExtraction>::Remove(Node* node, const T& value)
+	template<typename T>
+	typename AVLTree<T>::Node* AVLTree<T>::Remove(Node* node, const T& value)
 	{
 		if (node == nullptr) {
 			return node;
 		}
 
-		if (m_ValueExtraction(value) < m_ValueExtraction(node->values[0])) {
+		if (value < node->value) {
 			node->left = Remove(node->left, value);
 		}
-		else if (m_ValueExtraction(value) > m_ValueExtraction(node->values[0])) {
+		else if (value > node->value) {
 			node->right = Remove(node->right, value);
 		}
 		else {
-			auto it = std::find(node->values.begin(), node->values.end(), value);
+			--node->size;
 
-			if (it == node->values.end()) {
-				return node;
-			}
-
-			node->values.erase(it);
-
-			if (node->values.size() != 0) {
+			if (node->size > 0) {
 				--m_Size;
 				return node;
 			}
@@ -213,8 +197,9 @@ namespace Tree {
 			}
 			else {
 				Node* tmp = GetMinimumNode(node->right);
-				node->values = tmp->values;
-				node->right = Remove(node->right, tmp->values[0]);
+				node->value = tmp->value;
+				node->size = tmp->size;
+				node->right = Remove(node->right, tmp->value);
 			}
 		}
 
@@ -247,8 +232,8 @@ namespace Tree {
 		return node;
 	}
 
-	template<typename T, class ValueExtraction>
-	typename AVLTree<T, ValueExtraction>::Node* AVLTree<T, ValueExtraction>::GetMinimumNode(Node* node) const
+	template<typename T>
+	typename AVLTree<T>::Node* AVLTree<T>::GetMinimumNode(Node* node) const
 	{
 		Node* current = node;
 		while (current->left != nullptr) {
@@ -258,41 +243,33 @@ namespace Tree {
 		return current;
 	}
 
-	template<typename T, class ValueExtraction>
-	inline AVLTree<T, ValueExtraction>::AVLTree()
+	template<typename T>
+	inline AVLTree<T>::AVLTree()
 	{
 		m_Root = nullptr;
 		m_Size = 0;
 	}
 
-	template<typename T, class ValueExtraction>
-	inline AVLTree<T, ValueExtraction>::AVLTree(ValueExtraction valueExtraction)
-	{
-		m_Root = nullptr;
-		m_Size = 0;
-		m_ValueExtraction = valueExtraction;
-	}
-
-	template<typename T, class ValueExtraction>
-	inline AVLTree<T, ValueExtraction>::~AVLTree()
+	template<typename T>
+	inline AVLTree<T>::~AVLTree()
 	{
 		delete m_Root;
 	}
 
-	template<typename T, class ValueExtraction>
-	inline void AVLTree<T, ValueExtraction>::Insert(const T& value)
+	template<typename T>
+	inline void AVLTree<T>::Insert(const T& value)
 	{
 		m_Root = Insert(m_Root, value);
 	}
 
-	template<typename T, class ValueExtraction>
-	inline void AVLTree<T, ValueExtraction>::Remove(const T& value)
+	template<typename T>
+	inline void AVLTree<T>::Remove(const T& value)
 	{
 		m_Root = Remove(m_Root, value);
 	}
 
-	template<typename T, class ValueExtraction>
-	inline void AVLTree<T, ValueExtraction>::Edit(const T& oldValue, const T& newValue)
+	template<typename T>
+	inline void AVLTree<T>::Edit(const T& oldValue, const T& newValue)
 	{
 		if (!Contains(oldValue)) {
 			return;
@@ -302,8 +279,8 @@ namespace Tree {
 		m_Root = Insert(m_Root, newValue);
 	}
 
-	template<typename T, class ValueExtraction>
-	inline bool AVLTree<T, ValueExtraction>::Contains(const T& value) const
+	template<typename T>
+	inline bool AVLTree<T>::Contains(const T& value) const
 	{
 		if (m_Root == nullptr) {
 			return false;
@@ -311,20 +288,14 @@ namespace Tree {
 
 		Node* focusNode = m_Root;
 		while (focusNode != nullptr) {
-			if (m_ValueExtraction(value) == m_ValueExtraction(focusNode->values[0])) {
-				auto it = std::find(focusNode->values.begin(), focusNode->values.end(), value);
-
-				if (it == focusNode->values.end()) {
-					return false;
-				}
-
+			if (value == focusNode->value) {
 				return true;
 			}
 
-			if (m_ValueExtraction(value) < m_ValueExtraction(focusNode->values[0])) {
+			if (value < focusNode->value) {
 				focusNode = focusNode->left;
 			}
-			else if (m_ValueExtraction(value) > m_ValueExtraction(focusNode->values[0])) {
+			else if (value > focusNode->value) {
 				focusNode = focusNode->right;
 			}
 		}
@@ -332,37 +303,10 @@ namespace Tree {
 		return false;
 	}
 
-	template<typename T, class ValueExtraction>
-	inline size_t AVLTree<T, ValueExtraction>::Size() const
+	template<typename T>
+	inline size_t AVLTree<T>::Size() const
 	{
 		return m_Size;
-	}
-
-	template<typename T, class ValueExtraction>
-	template<typename I>
-	inline T AVLTree<T, ValueExtraction>::Search(const I& value) const
-	{
-		if (m_Root == nullptr) {
-			return T();
-		}
-
-		Node* focusNode = m_Root;
-		while (focusNode != nullptr) {
-			I nodeValue = (I)m_ValueExtraction(focusNode->values[0]);
-
-			if (value == nodeValue) {
-				return focusNode->values[0];
-			}
-
-			if (value < nodeValue) {
-				focusNode = focusNode->left;
-			}
-			else if (value > nodeValue) {
-				focusNode = focusNode->right;
-			}
-		}
-
-		return T();
 	}
 }
 #endif
