@@ -1,9 +1,7 @@
 #ifndef SET_H
 #define SET_H
 
-#include <algorithm>
-#include <stdexcept>
-
+#include <cstdlib>
 #include "AVLTree.h"
 
 namespace GenericContainers {

@@ -2,6 +2,7 @@
 #define LIGHTWEIGHTSET_H
 
 #include <stdexcept>
+#include <cstdlib>
 
 #define INITIAL_CAPACITY 100
 
