@@ -4,6 +4,8 @@
 #include <algorithm>
 #include <stdexcept>
 
+#include "AVLTree.h"
+
 namespace GenericContainers {
 	template<typename T>
 	class Set {
